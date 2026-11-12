@@ -1,4 +1,6 @@
+#include <chrono>
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include "lml/matrix.hpp"
@@ -87,12 +89,15 @@ int main() {
 
   std::cout << "res = {" << res[0] << ", " << res[1]
             << "}(should be {1.8,1.4})\n";
-
   K = {{1, 1}, {2, 2}};
   b = {2, 4};
+  auto start = std::chrono::high_resolution_clock::now();
   res = lml::solveAxb(K, b);
+  auto end = std::chrono::high_resolution_clock::now();
 
-  std::cout << "res = {" << res[0] << ", " << res[1] << "}(should be {2,0})\n";
+  auto duration = end - start;
+  std::cout << "res = {" << res[0] << ", " << res[1]
+            << "}(should be {2,0}) taking " << duration << "\n";
 
   K = {{1, 1}, {2, 2}};
   b = {2, 5};
@@ -111,6 +116,34 @@ int main() {
   res = lml::solveAxb(K, b);
 
   std::cout << res.empty() << "(should be 1)\n";
+
+  std::default_random_engine generator;
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
+
+  std::size_t msize = 1000;
+  lml::Matrix<double> M(msize, msize);
+  std::vector<double> v(msize);
+
+  for (int i = 0; i < msize; i++) {
+    for (int j = 0; j < msize; j++) {
+      M(i, j) = distribution(generator);
+    }
+  }
+
+  for (int i = 0; i < msize; i++) {
+    v[i] = distribution(generator);
+  }
+
+  start = std::chrono::high_resolution_clock::now();
+
+  auto solution = lml::solveAxb(M, v);
+
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  double seconds = std::chrono::duration<double>(duration).count();
+
+  std::cout << "duration for solving a " << msize << "x" << msize
+            << "matrix = " << seconds << " s. " << '\n';
 
   return 0;
 }

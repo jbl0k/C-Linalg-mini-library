@@ -222,6 +222,7 @@ Matrix<T> operator*(const Matrix<T> &A, const Matrix<T> &B) {
   }
   Matrix<T> result(B.cols(), A.rows());
 
+#pragma omp parallel for schedule(static)
   for (std::size_t i = 0; i < B.cols(); ++i) {
     for (std::size_t j = 0; j < A.rows(); ++j) {
       for (std::size_t k = 0; k < A.cols(); ++k) {
@@ -279,7 +280,7 @@ std::vector<T> solveAxb(const Matrix<T> &M, const std::vector<T> &rhs) {
     A.rowswap(pivotrow, r);
     std::swap(b[pivotrow], b[r]);
     pivots.push_back({r, k});
-
+#pragma omp parallel for schedule(static)
     for (std::size_t i = r + 1; i < A.rows(); i++) {
       T c = A(i, k) / A(r, k);
       A(i, k) = T{0};

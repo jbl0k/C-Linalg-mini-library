@@ -14,6 +14,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 
 add_executable(
         hello
@@ -27,6 +28,12 @@ add_executable(
     
 add_library(lml
     src/matrix.cpp
+)
+
+target_link_libraries(
+    lml
+    PUBLIC
+        OpenMP::OpenMP_CXX
 )
 
 target_link_libraries(
